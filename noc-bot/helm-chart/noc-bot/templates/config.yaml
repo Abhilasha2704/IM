@@ -1,0 +1,62 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ template "name" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    name: {{ template "name" . }}
+    type: configmap
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+    environment: "{{ .Values.EnvironmentName }}"
+data:
+  properties.yml: |
+    watsonWorkspace:
+       auth:
+          appId: {{ .Values.appId }}
+          appSecret: 
+          webhookSecret: 
+       space:
+          spaceId: {{ .Values.spaceId }}
+       mentions:
+          - "/swat"
+          - "/tb"
+          - "/ptb"
+          - "/noc"
+       unitTestMentions: "/nocut"
+       username: 
+       password: 
+    api:
+       publicHostname: "noc.watsontalent-prodk8s-uss.us-south.containers.appdomain.cloud"
+       path: {{.Values.apiPath}}
+       port: {{.Values.apiPort}}
+       username: 
+       password: 
+       secret: 
+       token: 
+       joinToken:
+       leaveToken:
+       debug: False
+       secret: 
+       incidentManagerSecret:
+    pagerduty:
+       token: 
+    slack:
+       auth:
+          appId: {{ .Values.slack.appId }}
+          clientId: "{{ .Values.slack.clientId }}"
+          teamId: "{{ .Values.slack.teamId }}"
+          clientSecret:
+          signingSecret:
+          oauthAccessToken:
+       mentions:
+          - "@swat"
+          - "@tb"
+          - "@ptb"
+          - "@noc"
+          - "@wbj6620f5"
+       unitTestMentions: "@nocut"
+    notifications:
+       spaceId: {{ .Values.notifications.spaceId }}
+       channelId: {{ .Values.notifications.channelId }}

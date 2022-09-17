@@ -1,0 +1,58 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: zoom-bot
+  namespace: im
+  labels:
+    name: zoom-bot
+data:
+  properties.yml: |
+    watsonWorkspace:
+       auth:
+          appId: 
+          appSecret: 
+          webhookSecret: 
+       space:
+          spaceId: 
+       mentions:
+          - "/swat"
+          - "/tb"
+          - "/ptb"
+          - "/noc"
+       unitTestMentions: "/nocut"
+       username: 
+       password: 
+    api:
+       publicHostname: "infiniteaks.brassring.com/noc"
+       #  publicHostname: "20.72.66.233"
+       path: /api/v1/cisco
+       port: 5000
+       username: 
+       password: 
+       secret: 
+       token: 
+       joinToken:
+       leaveToken:
+       debug: False
+       secret: 
+       incidentManagerSecret:
+    pagerduty:
+       token: 
+    slack:
+       auth:
+          appId: A02DM1TJV25
+          clientId: "2311433008433.2463061641073"
+          teamId: "T0295CR08CR"
+          clientSecret:
+          signingSecret:
+          oauthAccessToken:
+       mentions:
+          - "@swat"
+          - "@tb"
+          - "@ptb"
+          - "@noc"
+          - "@wbj6620f5"
+       unitTestMentions: "@nocut"
+    notifications:
+       spaceId: 
+       channelId:

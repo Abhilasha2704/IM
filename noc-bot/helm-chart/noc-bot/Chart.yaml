@@ -1,0 +1,13 @@
+name: noc-bot
+version: 1
+description: Helm Chart for the noc bot, which is a Watson Workspace application.
+keywords:
+  - noc-bot
+  - bot
+  - Watson Workspace
+home: https://github.ibm.com/cloud-operations/noc-bot
+sources:
+  - https://github.ibm.com/cloud-operations/noc-bot
+maintainers:
+  - name: Port Squad (https://github.ibm.com/cloud-operations)
+engine: gotpl

@@ -1,0 +1,47 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: pagerduty-bot
+  namespace: im
+  labels:
+    name: pagerduty-bot
+data:
+  properties.yml: |
+    watsonWorkspace:
+       auth:
+          appId: 
+          appSecret: 
+          webhookSecret: 
+       space:
+          spaceId: 
+       mentions:
+          - "/pd"
+          - "/pagerduty"
+       unitTestMentions: "/pdut"
+    pagerduty:
+       apiKey: 
+       email: "infinite-talent-incident-manager-001@infinite.com"
+    api:
+       publicHostname: "infiniteaks.brassring.com/noc"
+       #  publicHostname: "20.72.66.233"
+       path: /api/v1/pagerduty
+       port: 5000
+       debug: False
+       secret: 
+    slack:
+       auth:
+          appId: A02E697FLP8
+          clientId: "2311433008433.2482313530790"
+          teamId: "T0295CR08CR"
+          clientSecret:
+          signingSecret:
+          oauthAccessToken:
+       mentions:
+          - "@pagerduty"
+          - "@PagerDuty"
+          - "@pd"
+          - "@wbj9fsmne"
+       unitTestMentions: "@pdut"
+    notifications:
+       spaceId: 
+       channelId:

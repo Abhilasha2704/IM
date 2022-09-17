@@ -1,0 +1,19 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: zoom-bot
+  namespace: im
+  labels:
+    name: zoom-bot
+spec:
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 5000
+      # nodePort: 31241
+  selector:
+    name: zoom-bot
+  type: ClusterIP
+status:
+  loadBalancer: {}

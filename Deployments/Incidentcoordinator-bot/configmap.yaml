@@ -1,0 +1,32 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: incidentcoordinator-bot
+  namespace: im
+  labels:
+    name: incidentcoordinator-bot
+data:
+  properties.yml: |
+    api:
+       publicHostname: "infiniteaks.brassring.com/noc"
+      #  publicHostname: "20.72.66.233"
+       path: /api/v1/incidentcoordinator
+       port: 5000
+       secret: 
+       token: 
+       debug: False
+       incidentManagerSecret:
+       username: 
+       password: 
+    slack:
+       auth:
+          appId: A02ECNVG4JW
+          clientSecret:
+          signingSecret:
+          oauthAccessToken:
+       mentions:
+          - "@ic"
+          - "@wbk6e74by"
+       unitTestMentions: "@icut"
+    notifications:
+       channelId:

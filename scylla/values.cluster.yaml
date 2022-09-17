@@ -1,0 +1,57 @@
+# Version information
+scyllaImage:
+  tag: 4.4.3
+agentImage:
+  tag: 2.2.1
+
+
+
+nameOverride: im-scylla
+
+
+
+serviceMonitor:
+  create: false
+
+
+
+# Cluster information
+developerMode: false
+datacenter: us-south-1
+racks:
+- name: us-south-1a
+  members: 2
+  storage:
+    capacity: 30Gi
+    storageClassName: managed-premium
+#  resources:
+#    limits:
+#      cpu: 4
+#      memory: 32Gi
+#    requests:
+#      cpu: 4
+#      memory: 32Gi
+  volumes:
+  - name: scylla-certs
+    secret:
+      secretName: scylla-certs
+      defaultMode: 0400
+      items:
+      - key: tls.crt
+        path: scylla-im.cert.pem
+      - key: tls.key
+        path: scylla-im.key.pem
+  - name: intermediate-ca
+    secret:
+      secretName: intermediate-ca
+      defaultMode: 0400
+      items:
+      - key: tls.crt
+        path: ca-chain.cert.pem
+  volumeMounts:
+  - name: scylla-certs
+    mountPath: "/etc/scylla-certs"
+    readOnly: true
+  - name: intermediate-ca
+    mountPath: "/etc/intermediate-ca"
+    readOnly: true

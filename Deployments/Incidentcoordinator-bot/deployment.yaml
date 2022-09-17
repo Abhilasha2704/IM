@@ -1,0 +1,211 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: incidentcoordinator-bot
+  namespace: im
+  
+  labels:
+    
+    name: incidentcoordinator-bot
+    
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      name: incidentcoordinator-bot
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        name: incidentcoordinator-bot
+    spec:
+      volumes:
+        - name: properties
+          configMap:
+            name: incidentcoordinator-bot
+            items:
+              - key: properties.yml
+                path: properties.yml
+            defaultMode: 420
+        - name: intermediate-ca
+          secret:
+            secretName: intermediate-ca
+            items:
+              - key: tls.crt
+                path: ca-chain.cert.pem
+            defaultMode: 256
+      containers:
+        - name: incidentcoordinator-bot
+          image: talentappsacr.azurecr.io/incidentcoordinator-bot
+          ports:
+            - name: http
+              containerPort: 5000
+              protocol: TCP
+          env:
+            - name: API_PATH
+              value: /api
+            - name: CURL_CA_BUNDLE
+            - name: ZOOKEEPER_CONNECT_STRING
+            - name: FLASK_APP_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: incidentcoordinator-bot
+                  key: flaskAppSecret
+            - name: FLASK_APP_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: incidentcoordinator-bot
+                  key: flaskAppToken
+            - name: API_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: incidentcoordinator-bot
+                  key: startIncidentUsername
+            - name: API_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: incidentcoordinator-bot
+                  key: startIncidentPassword
+            - name: NEW_RELIC_LICENSE_KEY
+            - name: SNIP_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: incidentcoordinator-bot
+                  key: snipApiKey
+            - name: NEW_RELIC_APP_NAME
+              value: incidentcoordinator-bot
+            - name: INTERNAL_CA_TRUSTCHAIN_CERT_PEM
+              valueFrom:
+                secretKeyRef:
+                  name: incidentcoordinator-bot
+                  key: scyllaCertChain
+            - name: CASSANDRA_CONTACT_POINTS
+              value: scylla-im-scylla-client.im.svc
+            - name: CASSANDRA_APP_USER
+              valueFrom:
+                secretKeyRef:
+                  name: incidentcoordinator-bot
+                  key: scylladbUsername
+            - name: CASSANDRA_APP_PW
+              valueFrom:
+                secretKeyRef:
+                  name: incidentcoordinator-bot
+                  key: scylladbPassword
+            - name: CASSANDRA_APP_KEYSPACE
+              value: incidentcoordinator
+            - name: ZOOKEEPER_CONNECT_STRING
+            - name: OAUTH2_CLIENT_ID
+            - name: OAUTH2_CLIENT_SECRET
+            - name: OAUTH2_IDENTITY_PROVIDER
+              value: ibmid
+            - name: OAUTH2_ISSUER
+            - name: BOX_RELAY_API_CREDS
+            - name: SAE_API_CREDS
+              valueFrom:
+                secretKeyRef:
+                  name: incidentcoordinator-bot
+                  key: saeApiKey
+            - name: TMS_API_CREDS
+              valueFrom:
+                secretKeyRef:
+                  name: incidentcoordinator-bot
+                  key: tmsStartIncidentKey
+            - name: PAGERDUTY_INTEGRATION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: incidentcoordinator-bot
+                  key: pagerDutyIntegrationKey
+            - name: INCIDENT_MANAGER_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: incidentcoordinator-bot
+                  key: incidentManagerSecret
+            - name: SLACK_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: incidentcoordinator-bot
+                  key: slackClientSecret
+            - name: SLACK_SIGNING_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: incidentcoordinator-bot
+                  key: slackSigningSecret
+            - name: SLACK_OAUTH_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: incidentcoordinator-bot
+                  key: slackBotAccessToken
+            - name: SLACK_BOT_USER_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: incidentcoordinator-bot
+                  key: slackBotAccessToken
+          resources:
+            limits:
+              cpu: 500m
+              memory: 128Mi
+            requests:
+              cpu: 20m
+              memory: 64Mi
+          volumeMounts:
+            - name: properties
+              mountPath: /config
+            - name: intermediate-ca
+              readOnly: true
+              mountPath: /opt/incidentcoordinator/conf/intermediate-ca
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 5000
+              scheme: HTTP
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+            periodSeconds: 15
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 5000
+              scheme: HTTP
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+            periodSeconds: 15
+            successThreshold: 1
+            failureThreshold: 3
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      imagePullSecrets:
+        - name: im-acr-key
+        - name: im-bots-key
+        - name: bluemix-default-secret-regional
+        - name: bluemix-default-secret-international
+        - name: all-icr-io
+        - name: default-icr-io
+        - name: default-us-icr-io
+        - name: default-uk-icr-io
+        - name: default-de-icr-io
+        - name: default-au-icr-io
+        - name: default-jp-icr-io
+        - name: bluemix-default-secret
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 2
+  minReadySeconds: 10
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
+status:
+  observedGeneration: 1
+  replicas: 3
+  updatedReplicas: 3
+  readyReplicas: 3
+  availableReplicas: 3
+

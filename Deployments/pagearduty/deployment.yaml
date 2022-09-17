@@ -1,0 +1,227 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: pagerduty-bot
+  namespace: im
+  uid: a40d3757-76b6-4ab3-9afe-fdb33d0d409c
+  resourceVersion: '630729225'
+  generation: 1
+  creationTimestamp: '2022-01-17T14:50:15Z'
+  labels:
+    app.kubernetes.io/managed-by: Helm
+    chart: pagerduty-bot-1
+    environment: ''
+    heritage: Helm
+    name: pagerduty-bot
+    release: pagerduty-bot
+    type: deployment
+  annotations:
+    deployment.kubernetes.io/revision: '1'
+    meta.helm.sh/release-name: pagerduty-bot
+    meta.helm.sh/release-namespace: im
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      name: pagerduty-bot
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        name: pagerduty-bot
+    spec:
+      volumes:
+        - name: properties
+          configMap:
+            name: pagerduty-bot
+            items:
+              - key: properties.yml
+                path: properties.yml
+            defaultMode: 420
+        - name: intermediate-ca
+          secret:
+            secretName: intermediate-ca
+            items:
+              - key: tls.crt
+                path: ca-chain.cert.pem
+            defaultMode: 256
+      containers:
+        - name: pagerduty-bot
+          image: talentappsacr.azurecr.io/pagerduty-bot
+          ports:
+            - name: http
+              containerPort: 5000
+              protocol: TCP
+          env:
+            - name: API_PATH
+              value: /api
+            - name: CURL_CA_BUNDLE
+            - name: ZOOKEEPER_CONNECT_STRING
+            - name: FLASK_APP_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: pagerduty-bot
+                  key: flaskAppSecret
+            - name: FLASK_APP_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: pagerduty-bot
+                  key: flaskAppToken
+            - name: API_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: pagerduty-bot
+                  key: startIncidentUsername
+            - name: API_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pagerduty-bot
+                  key: startIncidentPassword
+            - name: NEW_RELIC_LICENSE_KEY
+            - name: SNIP_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: pagerduty-bot
+                  key: snipApiKey
+            - name: NEW_RELIC_APP_NAME
+              value: pagerduty-bot
+            - name: INTERNAL_CA_TRUSTCHAIN_CERT_PEM
+              valueFrom:
+                secretKeyRef:
+                  name: pagerduty-bot
+                  key: scyllaCertChain
+            - name: CASSANDRA_CONTACT_POINTS
+              value: scylla-im-scylla-client.im.svc
+            - name: CASSANDRA_APP_USER
+              valueFrom:
+                secretKeyRef:
+                  name: pagerduty-bot
+                  key: scylladbUsername
+            - name: CASSANDRA_APP_PW
+              valueFrom:
+                secretKeyRef:
+                  name: pagerduty-bot
+                  key: scylladbPassword
+            - name: CASSANDRA_APP_KEYSPACE
+              value: pagerduty
+            - name: ZOOKEEPER_CONNECT_STRING
+            - name: OAUTH2_CLIENT_ID
+            - name: OAUTH2_CLIENT_SECRET
+            - name: OAUTH2_IDENTITY_PROVIDER
+              value: ibmid
+            - name: OAUTH2_ISSUER
+            - name: BOX_RELAY_API_CREDS
+            - name: SAE_API_CREDS
+              valueFrom:
+                secretKeyRef:
+                  name: pagerduty-bot
+                  key: saeApiKey
+            - name: TMS_API_CREDS
+              valueFrom:
+                secretKeyRef:
+                  name: pagerduty-bot
+                  key: tmsStartIncidentKey
+            - name: PAGERDUTY_INTEGRATION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: pagerduty-bot
+                  key: pagerDutyIntegrationKey
+            - name: PAGERDUTY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: pagerduty-bot
+                  key: pagerDutyApiKey
+            - name: INCIDENT_MANAGER_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: pagerduty-bot
+                  key: incidentManagerSecret
+            - name: SLACK_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: pagerduty-bot
+                  key: slackClientSecret
+            - name: SLACK_SIGNING_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: pagerduty-bot
+                  key: slackSigningSecret
+            - name: SLACK_OAUTH_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: pagerduty-bot
+                  key: slackBotAccessToken
+            - name: SLACK_BOT_USER_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: pagerduty-bot
+                  key: slackBotAccessToken
+          resources:
+            limits:
+              cpu: 500m
+              memory: 128Mi
+            requests:
+              cpu: 20m
+              memory: 64Mi
+          volumeMounts:
+            - name: properties
+              mountPath: /config
+            - name: intermediate-ca
+              readOnly: true
+              mountPath: /opt/pagerduty/conf/intermediate-ca
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 5000
+              scheme: HTTP
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+            periodSeconds: 15
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 5000
+              scheme: HTTP
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+            periodSeconds: 15
+            successThreshold: 1
+            failureThreshold: 3
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      imagePullSecrets:
+        - name: im-acr-key
+        - name: im-bots-key
+        - name: bluemix-default-secret-regional
+        - name: bluemix-default-secret-international
+        - name: all-icr-io
+        - name: default-icr-io
+        - name: default-us-icr-io
+        - name: default-uk-icr-io
+        - name: default-de-icr-io
+        - name: default-au-icr-io
+        - name: default-jp-icr-io
+        - name: bluemix-default-secret
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 2
+  minReadySeconds: 10
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
+status:
+  observedGeneration: 1
+  replicas: 3
+  updatedReplicas: 3
+  readyReplicas: 3
+  availableReplicas: 3
+  

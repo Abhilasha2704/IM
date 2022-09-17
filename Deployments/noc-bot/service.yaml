@@ -1,0 +1,17 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: noc-bot
+  namespace: im
+  labels:
+    name: noc-bot
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 5000
+  selector:
+    name: noc-bot
+  type: ClusterIP
+status:
+  loadBalancer: {}

@@ -1,0 +1,201 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: noc-bot1
+  namespace: im
+  labels:
+    name: noc-bot1
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      name: noc-bot1
+  template:
+    metadata:
+      labels:
+        name: noc-bot1
+    spec:
+      volumes:
+        - name: properties
+          configMap:
+            name: noc-bot1
+            items:
+              - key: properties.yml
+                path: properties.yml
+            # defaultMode: 420
+        - name: intermediate-ca
+          secret:
+            secretName: intermediate-ca
+            items:
+              - key: tls.crt
+                path: ca-chain.cert.pem
+            # defaultMode: 256
+      imagePullSecrets:
+        - name: im-acr-key
+      containers:
+        - name: noc-bot1
+          image: talentappsacr.azurecr.io/noc-bot
+          ports:
+            - name: http
+              containerPort: 5000
+              protocol: TCP
+          env:
+            - name: API_PATH
+              value: /api
+            - name: CURL_CA_BUNDLE
+            - name: ZOOKEEPER_CONNECT_STRING
+            - name: FLASK_APP_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: noc-bot1
+                  key: flaskAppSecret
+            - name: FLASK_APP_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: noc-bot1
+                  key: flaskAppToken
+            - name: API_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: noc-bot1
+                  key: startIncidentUsername
+            - name: API_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: noc-bot1
+                  key: startIncidentPassword
+            - name: NEW_RELIC_LICENSE_KEY
+            - name: SNIP_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: noc-bot1
+                  key: snipApiKey
+            - name: NEW_RELIC_APP_NAME
+              value: noc-bot1
+            - name: INTERNAL_CA_TRUSTCHAIN_CERT_PEM
+              valueFrom:
+                secretKeyRef:
+                  name: noc-bot1
+                  key: scyllaCertChain
+            - name: CASSANDRA_CONTACT_POINTS
+              value: scylla-im-scylla-client.im.svc
+            - name: CASSANDRA_APP_USER
+              valueFrom:
+                secretKeyRef:
+                  name: noc-bot1
+                  key: scylladbUsername
+            - name: CASSANDRA_APP_PW
+              valueFrom:
+                secretKeyRef:
+                  name: noc-bot1
+                  key: scylladbPassword
+            - name: CASSANDRA_APP_KEYSPACE
+              value: noc
+            - name: ZOOKEEPER_CONNECT_STRING
+            - name: OAUTH2_CLIENT_ID
+            - name: OAUTH2_CLIENT_SECRET
+            - name: OAUTH2_IDENTITY_PROVIDER
+              value: ibmid
+            - name: OAUTH2_ISSUER
+            - name: BOX_RELAY_API_CREDS
+            - name: SAE_API_CREDS
+              valueFrom:
+                secretKeyRef:
+                  name: noc-bot1
+                  key: saeApiKey
+            - name: TMS_API_CREDS
+              valueFrom:
+                secretKeyRef:
+                  name: noc-bot1
+                  key: tmsStartIncidentCreds
+            - name: PAGERDUTY_INTEGRATION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: noc-bot1
+                  key: pagerdutyIntegrationKey
+            - name: INCIDENT_MANAGER_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: noc-bot1
+                  key: incidentManagerSecret
+            - name: SLACK_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: noc-bot1
+                  key: slackClientSecret
+            - name: SLACK_SIGNING_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: noc-bot1
+                  key: slackSigningSecret
+            - name: SLACK_OAUTH_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: noc-bot1
+                  key: slackOauthAccessToken
+            - name: SLACK_BOT_USER_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: noc-bot1
+                  key: slackBotUserAccessToken
+          resources:
+            limits:
+              cpu: 500m
+              memory: 128Mi
+            requests:
+              cpu: 20m
+              memory: 64Mi
+          volumeMounts:
+            - name: properties
+              mountPath: /config
+            - name: intermediate-ca
+              readOnly: true
+              mountPath: /opt/noc/conf/intermediate-ca
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 5000
+              scheme: HTTP
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+            periodSeconds: 15
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 5000
+              scheme: HTTP
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+            periodSeconds: 15
+          #   successThreshold: 1
+          #   failureThreshold: 3
+          # terminationMessagePath: /dev/termination-log
+          # terminationMessagePolicy: File
+          imagePullPolicy: Always
+      # restartPolicy: Always
+      # terminationGracePeriodSeconds: 30
+      # dnsPolicy: ClusterFirst
+      # securityContext: {}
+      # imagePullSecrets:
+      #   - name: im-bots-key
+      #   - name: bluemix-default-secret-regional
+      #   - name: bluemix-default-secret-international
+      #   - name: all-icr-io
+      #   - name: default-icr-io
+      #   - name: default-us-icr-io
+      #   - name: default-uk-icr-io
+      #   - name: default-de-icr-io
+      #   - name: default-au-icr-io
+      #   - name: default-jp-icr-io
+      #   - name: bluemix-default-secret
+      # schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 2
+  minReadySeconds: 10
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600

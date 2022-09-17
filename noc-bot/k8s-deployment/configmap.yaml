@@ -1,0 +1,73 @@
+# Please edit the object below. Lines beginning with a '#' will be ignored,
+# and an empty file will abort the edit. If an error occurs while saving this file will be
+# reopened with the relevant failures.
+#
+apiVersion: v1
+data:
+  properties.yml: |
+    watsonWorkspace:
+       auth:
+          appId: 
+          appSecret: 
+          webhookSecret: 
+       space:
+          spaceId: 
+       mentions:
+          - "/swat"
+          - "/tb"
+          - "/ptb"
+          - "/noc"
+       unitTestMentions: "/nocut"
+       username: 
+       password: 
+    api:
+       publicHostname: "noc.watsontalent-prodk8s-uss.us-south.containers.appdomain.cloud"
+       path: "/api/v1/incident"
+       port: "5000"
+       username: 
+       password: 
+       secret: 
+       token: 
+       joinToken:
+       leaveToken:
+       debug: False
+       secret: 
+       incidentManagerSecret:
+    pagerduty:
+       token: 
+    slack:
+       auth:
+          appId: "A02DM1TJV25"
+          clientId: "2311433008433.2463061641073"
+          teamId: "T0295CR08CR"
+          clientSecret:
+          signingSecret:
+          oauthAccessToken:
+       mentions:
+          - "@swat"
+          - "@tb"
+          - "@ptb"
+          - "@noc"
+          - "@wbj6620f5"
+       unitTestMentions: "@nocut"
+    notifications:
+       spaceId: 
+       channelId: 
+kind: ConfigMap
+metadata:
+  # annotations:
+  #   meta.helm.sh/release-name: noc-bot
+  #   meta.helm.sh/release-namespace: im
+  # creationTimestamp: "2022-09-01T11:25:38Z"
+  labels:
+    # app.kubernetes.io/managed-by: Helm
+    # chart: noc-bot-v1
+    # environment: prod
+    # heritage: Helm
+    name: noc-bot1
+    # release: noc-bot
+    # type: configmap
+  name: noc-bot1
+  namespace: im
+  # resourceVersion: "5741085"
+  # uid: a681cd76-223b-4f5c-87e4-fed7bc761ad0

@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: noc-bot
+  namespace: im
+  labels:
+    name: noc-bot
+    type: service
+    chart: noc-bot
+    release: noc-bot
+    heritage: Helm
+    environment: prod
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 5000
+  selector:
+    name: noc-bot
+  type: LoadBalancer

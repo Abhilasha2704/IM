@@ -1,0 +1,33 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: concierge-bot
+  namespace: im
+  labels:
+    name: concierge-bot
+ 
+data:
+  properties.yml: |
+    api:
+       publicHostname: "infiniteaks.brassring.com/noc"
+      #  publicHostname: "20.72.66.233"
+       path: /api/v1/concierge
+       port: 5000
+       secret:
+       token:
+       debug: False
+       incidentManagerSecret:
+       username: 
+       password: 
+    slack:
+       auth:
+          appId: A027ZPPNSPK
+          clientSecret:
+          signingSecret:
+          oauthAccessToken:
+       mentions:
+          - "@ic"
+          - "@wbk6e74by"
+       unitTestMentions: "@icut"
+    notifications:
+       channelId:

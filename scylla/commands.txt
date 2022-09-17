@@ -1,0 +1,25 @@
+step 1:
+kubectl create namespace im
+kubectl -n im create secret tls scylla-certs --cert=intermediate/certs/scylla-im.cert.pem --key=intermediate/private/scylla-im.key.pem 
+kubectl -n im create secret tls intermediate-ca --cert=intermediate/certs/ca-chain.cert.pem --key=intermediate/private/intermediate.key.pem
+
+step 2:
+kubectl -n im create configmap scylla-config --from-file=examples/helm/scylla.yaml
+
+step 3:
+1. helm repo add scylla https://scylla-operator-charts.storage.googleapis.com/stable
+2. helm repo update
+3. kubectl apply -f cert-manager.yaml
+4. kubectl wait -n cert-manager --for=condition=ready pod -l app=cert-manager --timeout=60s
+5. helm install scylla-operator scylla/scylla-operator --values values.operator.yaml --create-namespace --namespace scylla-operator
+6. kubectl wait -n scylla-operator --for=condition=ready pod -l app.kubernetes.io/name=scylla-operator --timeout=240s
+7. helm install scylla scylla/scylla --values examples/helm/values.cluster.yaml --namespace im
+8. helm install scylla-manager scylla/scylla-manager --values values.manager.yaml --create-namespace --namespace scylla-manager
+9. kubectl -n scylla-operator get all
+10. kubectl -n scylla-manager get all
+11. kubectl -n im get all
+
+step 4:
+1. kubectl -n scylla exec -it scylla-im-scylla-us-south-us-south-1-0 bash
+2. export SSL_CERTFILE=/etc/intermediate-ca/ca-chain.cert.pem
+3. cqlsh --username=cassandra --password=cassandra --ssl

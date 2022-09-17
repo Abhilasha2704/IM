@@ -1,0 +1,215 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: zoom-bot
+  namespace: im
+  uid: be52149e-d187-4433-a676-cc508c4b38ab
+  resourceVersion: '630729210'
+  generation: 1
+  creationTimestamp: '2022-01-17T14:50:46Z'
+  labels:
+    app.kubernetes.io/managed-by: Helm
+    chart: zoom-bot-1
+    environment: prod
+    heritage: Helm
+    name: zoom-bot
+    release: zoon-bot
+    type: deployment
+  annotations:
+    deployment.kubernetes.io/revision: '1'
+    meta.helm.sh/release-name: zoon-bot
+    meta.helm.sh/release-namespace: im
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      name: zoom-bot
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        name: zoom-bot
+    spec:
+      volumes:
+        - name: properties
+          configMap:
+            name: zoom-bot
+            items:
+              - key: properties.yml
+                path: properties.yml
+            defaultMode: 420
+        - name: intermediate-ca
+          secret:
+            secretName: intermediate-ca
+            items:
+              - key: tls.crt
+                path: ca-chain.cert.pem
+            defaultMode: 256
+      containers:
+        - name: zoom-bot
+          image: talentappsacr.azurecr.io/zoom-bot
+          ports:
+            - name: http
+              containerPort: 5000
+              protocol: TCP
+          env:
+            - name: API_PATH
+              value: /api
+            - name: CURL_CA_BUNDLE
+            - name: ZOOKEEPER_CONNECT_STRING
+            - name: FLASK_APP_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: zoom-bot
+                  key: flaskAppSecret
+            - name: FLASK_APP_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: zoom-bot
+                  key: flaskAppToken
+            - name: API_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: zoom-bot
+                  key: startIncidentUsername
+            - name: API_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: zoom-bot
+                  key: startIncidentPassword
+            - name: NEW_RELIC_LICENSE_KEY
+            - name: SNIP_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: zoom-bot
+                  key: snipApiKey
+            - name: NEW_RELIC_APP_NAME
+              value: zoom-bot
+            - name: INTERNAL_CA_TRUSTCHAIN_CERT_PEM
+              valueFrom:
+                secretKeyRef:
+                  name: zoom-bot
+                  key: scyllaCertChain
+            - name: CASSANDRA_CONTACT_POINTS
+              value: scylla-im-scylla-client.im.svc
+            - name: CASSANDRA_APP_USER
+              valueFrom:
+                secretKeyRef:
+                  name: zoom-bot
+                  key: scylladbUsername
+            - name: CASSANDRA_APP_PW
+              valueFrom:
+                secretKeyRef:
+                  name: zoom-bot
+                  key: scylladbPassword
+            - name: CASSANDRA_APP_KEYSPACE
+              value: cisco
+            - name: ZOOKEEPER_CONNECT_STRING
+            - name: OAUTH2_CLIENT_ID
+            - name: OAUTH2_CLIENT_SECRET
+            - name: OAUTH2_IDENTITY_PROVIDER
+              value: ibmid
+            - name: OAUTH2_ISSUER
+            - name: BOX_RELAY_API_CREDS
+            - name: SAE_API_CREDS
+              valueFrom:
+                secretKeyRef:
+                  name: zoom-bot
+                  key: saeApiKey
+            - name: PUBLIC_HOSTNAME
+              value: InfiniteTalent-Zoom
+            - name: TMS_API_CREDS
+              valueFrom:
+                secretKeyRef:
+                  name: zoom-bot
+                  key: tmsStartIncidentKey
+            - name: PAGERDUTY_INTEGRATION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: zoom-bot
+                  key: pagerDutyIntegrationKey
+            - name: INCIDENT_MANAGER_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: zoom-bot
+                  key: incidentManagerSecret
+            - name: SLACK_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: zoom-bot
+                  key: slackClientSecret
+            - name: SLACK_SIGNING_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: zoom-bot
+                  key: slackSigningSecret
+            - name: SLACK_OAUTH_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: zoom-bot
+                  key: slackBotAccessToken
+            - name: SLACK_BOT_USER_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: zoom-bot
+                  key: slackBotAccessToken
+            - name: SENDGRID_API_KEY
+            - name: INSTANA_SERVICE_NAME
+            - name: INSTANA_AGENT_HOST
+          resources:
+            limits:
+              cpu: 500m
+              memory: 128Mi
+            requests:
+              cpu: 20m
+              memory: 64Mi
+          volumeMounts:
+            - name: properties
+              mountPath: /config
+            - name: intermediate-ca
+              readOnly: true
+              mountPath: /opt/cisco/conf/intermediate-ca
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 5000
+              scheme: HTTP
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+            periodSeconds: 15
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 5000
+              scheme: HTTP
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+            periodSeconds: 15
+            successThreshold: 1
+            failureThreshold: 3
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      imagePullSecrets:
+        - name: im-acr-key
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 2
+  minReadySeconds: 10
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
+status:
+  observedGeneration: 1
+  replicas: 3
+  updatedReplicas: 3
+  readyReplicas: 3
+  availableReplicas: 3

@@ -1,0 +1,47 @@
+namespace: "im"
+imageRegistry: "talentappsacr.azurecr.io"
+imageTag: "noc-bot"
+imagePullSecretName: "im-acr-key"
+imagePullPolicy: Always
+replicas: 3
+minReplicas: 3
+maxReplicas: 6
+maxUnavailableReplicas: 1
+maxSurgeReplicas: 2
+EnvironmentName: "prod"
+privateDomainName: ""
+apiPath: "/api/v1/incident"
+apiPort: "5000"
+scylla:
+  username: Y2Fzc2FuZHJh
+  password: NSo5MHdlcnQh
+cassandraAppKeyspace: "noc"
+slack:
+   appId: "A02DM1TJV25"
+   clientId: "2311433008433.2463061641073"
+   teamId: "T0295CR08CR"
+notifications:
+   channelId: ""
+# bots:
+#    noc:
+#      flaskAppSecret: aGFzaEJyb3duMSE=
+#      flaskAppToken: aGFzaEJyb3duMSE=
+#      startIncidentUsername: Y2xvdWRvcHM=
+#      startIncidentPassword: RlJMQjU7RzY5aW15eD5l
+#      tmsStartIncidentCreds: dStGYWJpcnNtZVRzWHJ2QWFwQmc= #tmsStartIncidentKey
+#      saeStartIncidentCreds: dStGYWJpcnNtZVRzWHJ2QWFwQmc= #tmsStartIncidentKey
+#      pagerdutyIntegrationKey: dStGYWJpcnNtZVRzWHJ2QWFwQmc=
+#      slack:
+#        clientSecret: MzdiYmMzZjA1YjExNjEzODlhMTljOGY3YTlkY2ZkYzk=
+#        signingSecret: MDc1YmFhZmY5NGNhODk3MmRiNzgxMjRjNDBiYjVjMzM=
+#        #oauthAccessToken: 57297211-4502-2c00-0332-298504466fe6
+#        botUserAccessToken: eG94Yi0yMzExNDMzMDA4NDMzLTI0NDQyMzY1NjczMTgtc25naUpwTXFOaXVKakpXZUlHbk1HSjJC #botAccessToken
+#   #  IBMid:
+#   #    Oauth2ClientSecret: 8b93f7ed-e110-c6ee-ec7d-09d46d1c7161
+#    snipApiKey: dStGYWJpcnNtZVRzWHJ2QWFwQmc=
+#    incidentManagerSecret: aGFzaEJyb3duMSE=
+# nr_licence_key: 8b93f7ed-e110-c6ee-ec7d-09d46d1c7161
+# # IBMidOauth2ClientSecret: 8b93f7ed-e110-c6ee-ec7d-09d46d1c7161
+# intermediateCert: e4513f86-79b7-2310-fbca-2c11a5411e88
+
+

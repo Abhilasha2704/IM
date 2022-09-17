@@ -1,0 +1,79 @@
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: aks-ingress
+  namespace: im
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: 'false'
+    nginx.ingress.kubernetes.io/use-regex: 'true'
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - infiniteaks.brassring.com
+      secretName: dnscerts
+  rules:
+    - host: infiniteaks.brassring.com
+      http:
+        paths:
+          - path: /noc
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: noc-bot
+                port:
+                  number: 80
+          - path: /api/v1/incidentcoordinator
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: incidentcoordinator-bot
+                port:
+                  number: 80
+          - path: /api/v1/cisco
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: zoom-bot
+                port:
+                  number: 80
+          - path: /incidents
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: incidentcoordinator-bot
+                port:
+                  number: 80
+          - path: /incident
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: incidentcoordinator-bot
+                port:
+                  number: 80
+          - path: /product
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: incidentcoordinator-bot
+                port:
+                  number: 80
+          - path: /api/v1/pagerduty
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: pagerduty-bot
+                port:
+                  number: 80
+          - path: /api/v1/concierge
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: concierge-bot
+                port:
+                  number: 80
+status:
+  loadBalancer:
+    ingress:
+      - ip: 40.70.174.231
