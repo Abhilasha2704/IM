@@ -1,0 +1,33 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: scylla-operator-webhook
+  namespace: scylla-operator
+  
+  labels:
+    app.kubernetes.io/instance: webhook-server
+    app.kubernetes.io/name: webhook-server
+  annotations:
+    meta.helm.sh/release-name: scylla-operator
+    meta.helm.sh/release-namespace: scylla-operator
+  
+spec:
+  ports:
+    - name: webhook
+      protocol: TCP
+      port: 443
+      targetPort: 5000
+  selector:
+    app.kubernetes.io/instance: webhook-server
+    app.kubernetes.io/name: webhook-server
+  clusterIP: 10.0.59.163
+  clusterIPs:
+    - 10.0.59.163
+  type: ClusterIP
+  sessionAffinity: None
+  ipFamilies:
+    - IPv4
+  ipFamilyPolicy: SingleStack
+  internalTrafficPolicy: Cluster
+status:
+  loadBalancer: {}
