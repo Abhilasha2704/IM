@@ -22,8 +22,8 @@ data:
        apiKey: 
        email: "infinite-talent-incident-manager-001@infinite.com"
     api:
-       publicHostname: "infiniteaks.brassring.com/noc"
-       #  publicHostname: "20.72.66.233"
+      #  publicHostname: "infiniteaks.brassring.com/noc"
+       publicHostname: "20.72.66.233"
        path: /api/v1/pagerduty
        port: 5000
        debug: False

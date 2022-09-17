@@ -8,8 +8,8 @@ metadata:
 data:
   properties.yml: |
     api:
-       publicHostname: "infiniteaks.brassring.com/noc"
-      #  publicHostname: "20.72.66.233"
+      #  publicHostname: "infiniteaks.brassring.com/noc"
+       publicHostname: "20.72.66.233"
        path: /api/v1/incidentcoordinator
        port: 5000
        secret: 
