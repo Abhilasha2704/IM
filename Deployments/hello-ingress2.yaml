@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-default
+  annotations:
+    #kubernetes.io/ingress.class: third
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"    
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /defaultHello
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: aks-helloworld-one
+            port: 
+              number: 80
