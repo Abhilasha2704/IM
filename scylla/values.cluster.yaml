@@ -4,16 +4,10 @@ scyllaImage:
 agentImage:
   tag: 2.2.1
 
-
-
 nameOverride: im-scylla
-
-
 
 serviceMonitor:
   create: false
-
-
 
 # Cluster information
 developerMode: false
@@ -23,14 +17,14 @@ racks:
   members: 2
   storage:
     capacity: 30Gi
-    storageClassName: managed-premium
-#  resources:
-#    limits:
-#      cpu: 4
-#      memory: 32Gi
-#    requests:
-#      cpu: 4
-#      memory: 32Gi
+    storageClassName: managed-premium1
+  resources:
+    limits:
+      cpu: 4
+      memory: 32Gi
+    requests:
+      cpu: 4
+      memory: 32Gi
   volumes:
   - name: scylla-certs
     secret:
